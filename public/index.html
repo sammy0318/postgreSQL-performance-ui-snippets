@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PostgreSQL Performance Chart</title>
+  <link rel="stylesheet" href="../styles/chartStyles.css" />
+</head>
+<body>
+  <h2>PostgreSQL Performance Insights</h2>
+  <select id="branchSelector"></select>
+  <canvas id="performanceChart"></canvas>
+
+  <script type="module">
+    import { performanceData } from "../data/mockPerformanceData.js";
+    import { renderChart } from "../charts/PerformanceChart.js";
+    import { filterDataByBranch } from "../utils/filterUtils.js";
+
+    const selector = document.getElementById("branchSelector");
+    const ctx = document.getElementById("performanceChart").getContext("2d");
+
+    let selectedBranch = "REL_13_STABLE";
+    const uniqueBranches = [...new Set(performanceData.map(d => d.branch))];
+    uniqueBranches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch;
+      option.textContent = branch;
+      selector.appendChild(option);
+    });
+
+    const chart = renderChart(ctx, performanceData, selectedBranch);
+    
+    function updateChart(branch) {
+      selectedBranch = branch;
+      const filtered = filterDataByBranch(performanceData, selectedBranch);
+      chart.data.labels = filtered.map(d => new Date(d.time * 1000).toLocaleDateString());
+      chart.data.datasets[0].data = filtered.map(d => d.metric);
+      chart.update();
+    }
+
+    selector.addEventListener("change", (e) => {
+      updateChart(e.target.value);
+    });
+
+    updateChart(selectedBranch);
+  </script>
+</body>
+</html>

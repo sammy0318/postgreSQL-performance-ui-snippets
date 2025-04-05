@@ -1,0 +1,11 @@
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  margin-top: 20px;
+}
+
+select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
